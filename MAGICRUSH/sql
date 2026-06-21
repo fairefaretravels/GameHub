@@ -1,0 +1,48 @@
+-- ============================================================
+-- Mack Magic Rush — Leaderboard table
+-- Run this once in Supabase: Project > SQL Editor > New query
+-- ============================================================
+
+create table if not exists public.leaderboard (
+  id bigint generated always as identity primary key,
+  player_name text not null,
+  score int not null,
+  best_streak int not null default 0,
+  served int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+-- Helpful index for "top scores" queries
+create index if not exists leaderboard_score_idx
+  on public.leaderboard (score desc);
+
+-- ============================================================
+-- Row Level Security
+-- Anon key is public-readable in any client-side app, so RLS
+-- policies are what actually protect the table. This setup:
+--   - anyone can READ the leaderboard (it's a leaderboard)
+--   - anyone can INSERT a new score (anon arcade play)
+--   - nobody can UPDATE or DELETE from the client
+-- This is "simple for testing" — fine for a casual arcade game,
+-- not appropriate if scores need to be tamper-proof later.
+-- ============================================================
+
+alter table public.leaderboard enable row level security;
+
+create policy "Public can read leaderboard"
+  on public.leaderboard for select
+  to anon
+  using (true);
+
+create policy "Public can submit a score"
+  on public.leaderboard for insert
+  to anon
+  with check (
+    char_length(player_name) between 1 and 24
+    and score >= 0 and score < 100000
+    and best_streak >= 0 and best_streak < 1000
+    and served >= 0 and served < 1000
+  );
+
+-- No update/delete policy is created, so those actions are
+-- blocked for the anon role by default once RLS is enabled.
