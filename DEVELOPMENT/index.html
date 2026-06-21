@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Game Ops Dashboard</title>
+
+<style>
+  body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#0b0f1a;
+    color:#fff;
+  }
+
+  header{
+    padding:16px;
+    background:#151b2d;
+    text-align:center;
+    font-weight:bold;
+    letter-spacing:1px;
+  }
+
+  .container{
+    padding:14px;
+    max-width:900px;
+    margin:auto;
+  }
+
+  .card{
+    background:#151b2d;
+    border:1px solid #2a3558;
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:10px;
+  }
+
+  .title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-weight:bold;
+  }
+
+  .tag{
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:12px;
+  }
+
+  .green{ background:#1f9d55; }
+  .yellow{ background:#d9a404; }
+  .red{ background:#d64545; }
+
+  .row{
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    margin-top:6px;
+    color:#b5c0ff;
+  }
+
+  button{
+    margin-top:8px;
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+  }
+
+  .btn-live{ background:#00d4ff; color:#000; }
+  .btn-edit{ background:#ffcc00; color:#000; }
+
+</style>
+</head>
+
+<body>
+
+<header>
+🎮 GAME OPS DASHBOARD — DEPLOYMENT CONTROL
+</header>
+
+<div class="container">
+
+  <!-- 2048 -->
+  <div class="card">
+    <div class="title">
+      2048
+      <span class="tag yellow" id="status-2048">In Progress</span>
+    </div>
+    <div class="row">
+      <span>Type: Puzzle</span>
+      <span>Setup: Easy</span>
+    </div>
+    <button class="btn-live" onclick="openLink('https://github.com')">
+      Open Repo
+    </button>
+    <button class="btn-edit" onclick="toggle('2048')">
+      Toggle Status
+    </button>
+  </div>
+
+  <!-- Snake -->
+  <div class="card">
+    <div class="title">
+      Snake
+      <span class="tag green" id="status-snake">Live</span>
+    </div>
+    <div class="row">
+      <span>Type: Arcade</span>
+      <span>Setup: Easy</span>
+    </div>
+    <button class="btn-live" onclick="openLink('https://fairefaretravels.github.io/Snake/')">
+      Open Game
+    </button>
+    <button class="btn-edit" onclick="toggle('snake')">
+      Toggle Status
+    </button>
+  </div>
+
+  <!-- Flappy Bird -->
+  <div class="card">
+    <div class="title">
+      Flappy Bird Clone
+      <span class="tag red" id="status-flappy">Not Started</span>
+    </div>
+    <div class="row">
+      <span>Type: Arcade</span>
+      <span>Setup: Easy</span>
+    </div>
+    <button class="btn-live" onclick="openLink('https://github.com')">
+      Open Repo
+    </button>
+    <button class="btn-edit" onclick="toggle('flappy')">
+      Toggle Status
+    </button>
+  </div>
+
+  <!-- Bartender Game -->
+  <div class="card">
+    <div class="title">
+      Bartender Rush
+      <span class="tag yellow" id="status-bartender">In Progress</span>
+    </div>
+    <div class="row">
+      <span>Type: Funnel Game</span>
+      <span>Setup: Medium</span>
+    </div>
+    <button class="btn-live" onclick="openLink('https://fairefaretravels.github.io/Snake/')">
+      Open Build
+    </button>
+    <button class="btn-edit" onclick="toggle('bartender')">
+      Toggle Status
+    </button>
+  </div>
+
+  <!-- Radio Game -->
+  <div class="card">
+    <div class="title">
+      Radio Takeover
+      <span class="tag red" id="status-radio">Not Started</span>
+    </div>
+    <div class="row">
+      <span>Type: Engagement</span>
+      <span>Setup: Medium</span>
+    </div>
+    <button class="btn-live" onclick="openLink('https://Radiomeltdown.store')">
+      Open Radio Site
+    </button>
+    <button class="btn-edit" onclick="toggle('radio')">
+      Toggle Status
+    </button>
+  </div>
+
+</div>
+
+<script>
+function openLink(url){
+  window.open(url, "_blank");
+}
+
+function toggle(game){
+  const el = document.getElementById("status-" + game);
+
+  if(el.innerText === "Live"){
+    el.innerText = "In Progress";
+    el.className = "tag yellow";
+  }
+  else if(el.innerText === "In Progress"){
+    el.innerText = "Not Started";
+    el.className = "tag red";
+  }
+  else{
+    el.innerText = "Live";
+    el.className = "tag green";
+  }
+
+  saveState();
+}
+
+function saveState(){
+  const data = {};
+  document.querySelectorAll(".tag").forEach(el=>{
+    data[el.id] = {
+      text: el.innerText,
+      className: el.className
+    };
+  });
+  localStorage.setItem("game_dashboard", JSON.stringify(data));
+}
+
+function loadState(){
+  const data = JSON.parse(localStorage.getItem("game_dashboard") || "{}");
+
+  Object.keys(data).forEach(id=>{
+    const el = document.getElementById(id);
+    if(el){
+      el.innerText = data[id].text;
+      el.className = data[id].className;
+    }
+  });
+}
+
+loadState();
+</script>
+
+</body>
+</html>
