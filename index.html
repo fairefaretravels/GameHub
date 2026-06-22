@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STV Game Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Exo+2:wght@300;400;600;700&display=swap');
+
+  :root {
+    --pink:   #ff2d78;
+    --blue:   #00cfff;
+    --purple: #b44fff;
+    --green:  #00ff9f;
+    --dark:   #060610;
+    --card-bg: rgba(6,6,20,0.82);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--dark);
+    font-family: 'Exo 2', sans-serif;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── Sweeping light beam ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: conic-gradient(
+      from 180deg at 50% 50%,
+      transparent 0deg,
+      rgba(180, 79, 255, 0.07) 10deg,
+      rgba(0, 207, 255, 0.13) 20deg,
+      rgba(255, 45, 120, 0.09) 30deg,
+      rgba(0, 255, 159, 0.06) 40deg,
+      transparent 55deg
+    );
+    animation: sweep 5s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes sweep {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ── Sliding neon bar across the page ── */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0,207,255,0.04) 20%,
+      rgba(180,79,255,0.10) 50%,
+      rgba(255,45,120,0.06) 80%,
+      transparent 100%
+    );
+    animation: slide 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes slide {
+    from { left: -60%; }
+    to   { left: 120%; }
+  }
+
+  /* ── Grid of stars ── */
+  .stars {
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 35% 65%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 45%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 80%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 90%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(1px 1px at 68% 30%, rgba(255,255,255,0.35) 0%, transparent 100%),
+      radial-gradient(1px 1px at 8%  55%, rgba(255,255,255,0.25) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Layout ── */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+  }
+
+  /* ── Header ── */
+  header {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+
+  .logo-tag {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--blue);
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--pink) 0%, var(--purple) 40%, var(--blue) 75%, var(--green) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 18px rgba(180,79,255,0.55));
+    animation: hue-shift 8s linear infinite;
+  }
+
+  @keyframes hue-shift {
+    0%   { filter: drop-shadow(0 0 18px rgba(180,79,255,0.55)); }
+    25%  { filter: drop-shadow(0 0 22px rgba(255,45,120,0.6)); }
+    50%  { filter: drop-shadow(0 0 18px rgba(0,207,255,0.55)); }
+    75%  { filter: drop-shadow(0 0 22px rgba(0,255,159,0.5)); }
+    100% { filter: drop-shadow(0 0 18px rgba(180,79,255,0.55)); }
+  }
+
+  .subtitle {
+    margin-top: 14px;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+  }
+
+  /* ── Neon divider ── */
+  .divider {
+    width: 120px;
+    height: 2px;
+    margin: 20px auto 0;
+    background: linear-gradient(90deg, var(--pink), var(--blue), var(--green));
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0,207,255,0.5);
+  }
+
+  /* ── Cards grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 28px 24px 24px;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+
+  /* Each card gets its own neon accent via data-color */
+  .card[data-color="pink"]   { --accent: var(--pink); }
+  .card[data-color="blue"]   { --accent: var(--blue); }
+  .card[data-color="purple"] { --accent: var(--purple); }
+  .card[data-color="green"]  { --accent: var(--green); }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at top left, rgba(var(--accent-rgb), 0.12) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  /* inline style trick for rgba since CSS custom properties can't split hex */
+  .card[data-color="pink"]::before   { background: radial-gradient(ellipse at top left, rgba(255,45,120,0.14) 0%, transparent 65%); }
+  .card[data-color="blue"]::before   { background: radial-gradient(ellipse at top left, rgba(0,207,255,0.12) 0%, transparent 65%); }
+  .card[data-color="purple"]::before { background: radial-gradient(ellipse at top left, rgba(180,79,255,0.14) 0%, transparent 65%); }
+  .card[data-color="green"]::before  { background: radial-gradient(ellipse at top left, rgba(0,255,159,0.10) 0%, transparent 65%); }
+
+  .card:hover {
+    transform: translateY(-6px) scale(1.02);
+  }
+  .card[data-color="pink"]:hover   { box-shadow: 0 0 32px rgba(255,45,120,0.4),  0 16px 40px rgba(0,0,0,0.5); border-color: rgba(255,45,120,0.5); }
+  .card[data-color="blue"]:hover   { box-shadow: 0 0 32px rgba(0,207,255,0.4),   0 16px 40px rgba(0,0,0,0.5); border-color: rgba(0,207,255,0.5); }
+  .card[data-color="purple"]:hover { box-shadow: 0 0 32px rgba(180,79,255,0.4),  0 16px 40px rgba(0,0,0,0.5); border-color: rgba(180,79,255,0.5); }
+  .card[data-color="green"]:hover  { box-shadow: 0 0 32px rgba(0,255,159,0.35),  0 16px 40px rgba(0,0,0,0.5); border-color: rgba(0,255,159,0.5); }
+
+  .card-icon {
+    font-size: 2.4rem;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .card-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    align-self: flex-start;
+  }
+  .card[data-color="pink"]   .card-tag { background: rgba(255,45,120,0.18);  color: var(--pink); }
+  .card[data-color="blue"]   .card-tag { background: rgba(0,207,255,0.15);   color: var(--blue); }
+  .card[data-color="purple"] .card-tag { background: rgba(180,79,255,0.18);  color: var(--purple); }
+  .card[data-color="green"]  .card-tag { background: rgba(0,255,159,0.14);   color: var(--green); }
+
+  .card-title {
+    font-family: 'Black Ops One', sans-serif;
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+  }
+  .card[data-color="pink"]   .card-title { color: var(--pink); text-shadow: 0 0 12px rgba(255,45,120,0.5); }
+  .card[data-color="blue"]   .card-title { color: var(--blue); text-shadow: 0 0 12px rgba(0,207,255,0.5); }
+  .card[data-color="purple"] .card-title { color: var(--purple); text-shadow: 0 0 12px rgba(180,79,255,0.5); }
+  .card[data-color="green"]  .card-title { color: var(--green); text-shadow: 0 0 12px rgba(0,255,159,0.4); }
+
+  .card-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.55;
+    flex: 1;
+  }
+
+  .card-play {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    align-self: flex-start;
+    transition: opacity 0.2s;
+  }
+  .card[data-color="pink"]   .card-play { background: rgba(255,45,120,0.2);  color: var(--pink);   border: 1px solid rgba(255,45,120,0.4); }
+  .card[data-color="blue"]   .card-play { background: rgba(0,207,255,0.15);  color: var(--blue);   border: 1px solid rgba(0,207,255,0.4); }
+  .card[data-color="purple"] .card-play { background: rgba(180,79,255,0.18); color: var(--purple); border: 1px solid rgba(180,79,255,0.4); }
+  .card[data-color="green"]  .card-play { background: rgba(0,255,159,0.14);  color: var(--green);  border: 1px solid rgba(0,255,159,0.35); }
+  .card:hover .card-play { opacity: 0.85; }
+
+  /* ── Corner accent line ── */
+  .card-corner {
+    position: absolute;
+    top: 0; right: 0;
+    width: 48px; height: 48px;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .card-corner::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 100%; height: 100%;
+    border-top: 2px solid;
+    border-right: 2px solid;
+    border-radius: 0 16px 0 0;
+  }
+  .card[data-color="pink"]   .card-corner::before { border-color: var(--pink);   box-shadow: 2px -2px 8px rgba(255,45,120,0.5); }
+  .card[data-color="blue"]   .card-corner::before { border-color: var(--blue);   box-shadow: 2px -2px 8px rgba(0,207,255,0.5); }
+  .card[data-color="purple"] .card-corner::before { border-color: var(--purple); box-shadow: 2px -2px 8px rgba(180,79,255,0.5); }
+  .card[data-color="green"]  .card-corner::before { border-color: var(--green);  box-shadow: 2px -2px 8px rgba(0,255,159,0.4); }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 480px) {
+    .grid { grid-template-columns: 1fr; }
+    h1 { font-size: 2.4rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before, body::after, h1 { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+
+<div class="page">
+
+  <header>
+    <div class="logo-tag">Sanecatv.com · STV Digital</div>
+    <h1>Game Hub</h1>
+    <p class="subtitle">Play · Create · Compete</p>
+    <div class="divider"></div>
+  </header>
+
+  <div class="grid">
+
+    <a class="card" data-color="purple" href="https://fairefaretravels.github.io/GameHub/MAGICRUSH/">
+     <div class="card-corner"></div>
+     <div class="card-icon">🍹</div>
+     <span class="card-tag">Arcade</span>
+     <div class="card-title">Bartender Rush</div>
+     <p class="card-desc">Serve the customer rush before they walk. Tap the right ingredients in order — streaks earn bigger tips.</p>
+    <span class="card-play">▶ Play</span>
+  </a>
+
+    <a class="card" data-color="pink" href="https://fairefaretravels.github.io/GameHub/SKETCH/">
+      <div class="card-corner"></div>
+      <div class="card-icon">🎨</div>
+      <span class="card-tag">Drawing</span>
+      <div class="card-title">Detroit Etch A Sketch</div>
+      <p class="card-desc">Trace the Detroit skyline as one continuous line. One rule: never lift the stylus. Shake to erase.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="green" href="https://fairefaretravels.github.io/GameHub/SNAKE/">
+      <div class="card-corner"></div>
+      <div class="card-icon">🐍</div>
+      <span class="card-tag">Arcade</span>
+      <div class="card-title">Snake</div>
+      <p class="card-desc">The classic. Eat, grow, don't hit the wall — or yourself. How long can you survive the grid?</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="blue" href="https://stv-speech-arena.vercel.app/">
+      <div class="card-corner"></div>
+      <div class="card-icon">🗣️</div>
+      <span class="card-tag">Language</span>
+      <div class="card-title">Speech Arena</div>
+      <p class="card-desc">Eight game modes — Word Match, Speed Round, Sentence Builder, and more. Multilingual ESL challenge.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="purple" href="https://pop-and-smash-pic-pro.vercel.app/">
+      <div class="card-corner"></div>
+      <div class="card-icon">💥</div>
+      <span class="card-tag">Arcade</span>
+      <div class="card-title">Pop &amp; Smash</div>
+      <p class="card-desc">Tap fast, smash hard. A quick-reflex arcade game built for mobile — how high can your combo get?</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="green" href="https://fairefaretravels.github.io/STV-reading101-parent/">
+      <div class="card-corner"></div>
+      <div class="card-icon">🔤</div>
+      <span class="card-tag">Word</span>
+      <div class="card-title">Word Builder</div>
+      <p class="card-desc">Construct words from scrambled letters before the clock runs out. Earn bonus rounds for streaks.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="pink" href="neverland-rpg.html">
+      <div class="card-corner"></div>
+      <div class="card-icon">⚔️</div>
+      <span class="card-tag">RPG</span>
+      <div class="card-title">Neverland Underground</div>
+      <p class="card-desc">D&amp;D-style Detroit street RPG. Navigate Belle Isle, face Hook's debt collectors, find the Lost Boys.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="blue" href="https://bestietracker.netlify.app/">
+      <div class="card-corner"></div>
+      <div class="card-icon">👯</div>
+      <span class="card-tag">Social</span>
+      <div class="card-title">Bestie Check-In</div>
+      <p class="card-desc">A feelings-based daily check-in game for friends. Answer together, see how well you actually know each other.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="purple" href="timeout-sports.html">
+      <div class="card-corner"></div>
+      <div class="card-icon">🏀</div>
+      <span class="card-tag">Trivia</span>
+      <div class="card-title">Timeout Sports Talk</div>
+      <p class="card-desc">Live audience Q&amp;A game for sports shows. Host fires questions, guests answer in real time on their phones.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="green" href="pascagoula-city.html">
+      <div class="card-corner"></div>
+      <div class="card-icon">🏙️</div>
+      <span class="card-tag">Builder</span>
+      <div class="card-title">Pascagoula City Grid</div>
+      <p class="card-desc">Design a city block by block on Mack's 50 acres. Zone, build, and plan — Highland Park rules apply.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="pink" href="suno-remix.html">
+      <div class="card-corner"></div>
+      <div class="card-icon">🎵</div>
+      <span class="card-tag">Music</span>
+      <div class="card-title">Beat Lab</div>
+      <p class="card-desc">Tap pads to build a beat. Record your loop, name it, share it. Powered by STV Radiomeltdown audio.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+    <a class="card" data-color="blue" href="animation-prep.html">
+      <div class="card-corner"></div>
+      <div class="card-icon">🎬</div>
+      <span class="card-tag">Studio</span>
+      <div class="card-title">Animation Prep</div>
+      <p class="card-desc">Browser-based animation production dashboard. Storyboard, assign departments, track your episode pipeline.</p>
+      <span class="card-play">▶ Play</span>
+    </a>
+
+  </div>
+
+  <footer> SANECA TV DIGITAL · Radiomeltdown.com · Lithonia, GA</footer>
+</div>
+
+</body>
+</html>
